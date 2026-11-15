@@ -1,12 +1,55 @@
 # Unit tests against a mocked azurerm provider: no Azure credentials, nothing
 # created. Plan runs check what is configured; apply runs also check values
-# Azure would compute (IDs, principal IDs), which the mock makes up.
+# Azure would compute (IDs, principal IDs), which the mock makes up. The
+# provider still validates resource IDs passed between resources, so those
+# get realistic values here.
 mock_provider "azurerm" {
   mock_data "azurerm_client_config" {
     defaults = {
       tenant_id       = "11111111-1111-1111-1111-111111111111"
       subscription_id = "22222222-2222-2222-2222-222222222222"
     }
+  }
+
+  mock_resource "azurerm_service_plan" {
+    defaults = {
+      id = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-notes-lab-zan/providers/Microsoft.Web/serverFarms/asp-notes-lab-zan"
+    }
+  }
+
+  mock_resource "azurerm_user_assigned_identity" {
+    defaults = {
+      id           = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-notes-lab-zan/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-notes-deploy-lab-zan"
+      client_id    = "44444444-4444-4444-4444-444444444444"
+      principal_id = "55555555-5555-5555-5555-555555555555"
+    }
+  }
+
+  mock_resource "azurerm_key_vault" {
+    defaults = {
+      id = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-notes-lab-zan/providers/Microsoft.KeyVault/vaults/kv-notes-lab-zan"
+    }
+  }
+
+  mock_resource "azurerm_application_insights" {
+    defaults = {
+      id = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-notes-lab-zan/providers/Microsoft.Insights/components/appi-notes-lab-zan"
+    }
+  }
+}
+
+# The two sites get different IDs, so a test can tell their grants apart.
+override_resource {
+  target = azurerm_linux_web_app.web
+  values = {
+    id = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-notes-lab-zan/providers/Microsoft.Web/sites/app-notes-web-lab-zan"
+  }
+}
+
+override_resource {
+  target = azurerm_linux_web_app.api
+  values = {
+    id = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-notes-lab-zan/providers/Microsoft.Web/sites/app-notes-api-lab-zan"
   }
 }
 
