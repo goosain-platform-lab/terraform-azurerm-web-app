@@ -50,6 +50,10 @@ override_resource {
   target = azurerm_linux_web_app.api
   values = {
     id = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-notes-lab-zan/providers/Microsoft.Web/sites/app-notes-api-lab-zan"
+    identity = [{
+      principal_id = "66666666-6666-6666-6666-666666666666"
+      tenant_id    = "11111111-1111-1111-1111-111111111111"
+    }]
   }
 }
 
